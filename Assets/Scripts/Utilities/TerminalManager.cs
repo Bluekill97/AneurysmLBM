@@ -27,7 +27,11 @@ namespace Utilities.Terminal {
 
         bool debugMode = true;
 
-
+        /// <summary>
+        /// Executes
+        /// </summary>
+        /// <param name="ttask"></param>
+        /// <returns></returns>
         public async Task<bool> RunAsync(ITerminalTask ttask) {
             currentTask = ttask;
             EndedWithError = false;
@@ -44,7 +48,7 @@ namespace Utilities.Terminal {
             // redirect standard outout -> required setting set UseShellExecute false
             process.StartInfo.UseShellExecute = false;
 
-            // redirect all inputs from the window to us
+            // redirect all inputs from the window (windows when starting wsl) to us
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.RedirectStandardInput = true;
             process.StartInfo.RedirectStandardError = true;
@@ -56,7 +60,7 @@ namespace Utilities.Terminal {
             process.Exited += CommandExit;
 
             // since everything is redirected we dont need to see the window anymore
-            //process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            // process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             process.StartInfo.CreateNoWindow = true;
 
             try {
@@ -78,7 +82,7 @@ namespace Utilities.Terminal {
                 return false;
             }
 
-            // wait for command finish
+            // wait for command finish, is set to true in ProcessDataReceived or ProcessErrorReceived
             await Task.WhenAny(taskHandled.Task);
 
 
@@ -99,6 +103,7 @@ namespace Utilities.Terminal {
                 process.CancelErrorRead();
                 //process.Kill();
 
+                // set true to tell RunAsync method task has ended
                 taskHandled.TrySetResult(true);
                 return;
             }
@@ -116,6 +121,7 @@ namespace Utilities.Terminal {
                 process.CancelOutputRead();
                 process.CancelErrorRead();
 
+                // set true to tell RunAsync method task has ended
                 taskHandled.TrySetResult(true);
                 return;
             }

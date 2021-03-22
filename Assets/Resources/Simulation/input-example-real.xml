@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<hemelbsettings version="3">
+  <simulation>
+    <step_length units="s" value="5e-5"/>
+    <steps units="lattice" value="4500"/>
+    <stresstype value="1"/>
+    <voxel_size units="m" value="66.67e-6"/>
+    <origin units="m" value="(0.0,0.0,0.0)"/>
+  </simulation>
+  <geometry>
+    <datafile path="bifurcation.gmy"/>
+  </geometry>
+  <initialconditions>
+    <pressure>
+      <uniform units="mmHg" value="0.1"/>
+    </pressure>
+  </initialconditions>
+  <monitoring>
+    <incompressibility/>
+  </monitoring>
+  <inlets>
+    <inlet>
+      <condition subtype="cosine" type="pressure">
+        <amplitude units="mmHg" value="0.0"/>
+        <mean units="mmHg" value="0.1"/>
+        <phase units="rad" value="0.0"/>
+        <period units="s" value="1"/>
+      </condition>
+      <normal units="dimensionless" value="(1.95124e-12,6.75884e-12,1)"/>
+      <position units="lattice" value="(77.999,18.1515,3)"/>
+    </inlet>
+  </inlets>
+  <outlets>
+    <outlet>
+      <condition subtype="cosine" type="pressure">
+        <amplitude units="mmHg" value="0.0"/>
+        <mean units="mmHg" value="0.0"/>
+        <phase units="rad" value="0.0"/>
+        <period units="s" value="1"/>
+      </condition>
+      <normal units="dimensionless" value="(0.707107,-1.16626e-11,-0.707107)"/>
+      <position units="lattice" value="(13.7137,18.1515,173.351)"/>
+    </outlet>
+    <outlet>
+      <condition subtype="cosine" type="pressure">
+        <amplitude units="mmHg" value="0.0"/>
+        <mean units="mmHg" value="0.0"/>
+        <phase units="rad" value="0.0"/>
+        <period units="s" value="1"/>
+      </condition>
+      <normal units="dimensionless" value="(-0.707107,-2.00453e-11,-0.707107)"/>
+      <position units="lattice" value="(142.284,18.1515,173.351)"/>
+    </outlet>
+  </outlets>
+  <!--
+  <colloids>
+  -->
+    <particles>
+      <!-- this is the master particle
+      it will be replicated on particle injection  -->
+      <subgridParticle units="lattice" ParticleId="0" Radius="0.01">
+        <initialPosition units="lattice" x="68.0" y="18.1515" z="40.0"/>
+      </subgridParticle>
+      <!-- this is the master particle
+      it will be replicated on particle injection  -->
+      <sphereRadius  units="lattice" value="4.0"/>
+      <sphereCentre  units="lattice" x="77.999" y="18.1515" z="50.0"/>
+      <emissionCount units="dimensionless" value="100"/>
+      <emissionItrvl units="dimensionless" value="10"/>
+      <!-- one sphere -->
+      <!-- Moritz: code deleted -->
+      <!-- two spheres -->
+    </particles>
+    <bodyForces>
+      <!--
+      <gravitic forceName="gravity">
+        <field units="m/s^2" x="0.0" y="0.0" z="9.81"/>
+      </gravitic>
+      <magnetic forceName="dipolar">
+        <magneticMoment units="A·m^2" x="0.0" y="0.0" z="50.0"/>
+        <position units="lattice" x="110.0" y="18.1515" z="118.0"/>
+      </magnetic>
+      -->
+    </bodyForces>
+    <boundaryConditions>
+      <lubrication appliesTo="Wall" effectiveRange="1.0"/>
+      <deletion appliesTo="Olet" effectiveRange="1.0"/>
+      <spherical appliesTo="Sphr">
+        <sphereRadius units="lattice" value="0.0"/>
+        <sphereCentre units="lattice" x="0.0" y="0.0" z="0.0"/>
+      </spherical>
+    </boundaryConditions>
+  <!--
+  </colloids>
+  -->
+  <properties>
+    <propertyoutput file="whole.dat" period="100">
+      <geometry type="whole" />
+      <field type="velocity" />
+      <field type="pressure" />
+    </propertyoutput>
+  </properties>
+</hemelbsettings>

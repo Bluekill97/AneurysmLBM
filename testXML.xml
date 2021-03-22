@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hemelbsettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3">
+  <simulation>
+    <step_length units="s" value="0" />
+    <steps units="lattice" value="0" />
+    <stresstype value="1" />
+    <voxel_size units="m" value="0" />
+    <origin units="m" value="(0.0,0.0,0.0)" />
+  </simulation>
+</hemelbsettings>

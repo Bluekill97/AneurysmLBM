@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hemelbsettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3">
+  <simulation>
+    <step_length units="s" value="5E-05" />
+    <steps units="lattice" value="4500" />
+    <stresstype value="1" />
+    <voxel_size units="m" value="6.667E-05" />
+    <origin units="m" value="(0.0,0.0,0.0)" />
+  </simulation>
+  <geometry>
+    <datafile path="bifurcation.gmy" />
+  </geometry>
+  <initialconditions>
+    <pressure>
+      <uniform units="mmHg" value="0.1" />
+    </pressure>
+  </initialconditions>
+  <monitoring>
+    <incompressibility />
+  </monitoring>
+  <inlets>
+    <inlet>
+      <condition subtype="cosine" type="pressure">
+        <amplitude units="mmHg" value="0" />
+        <mean units="mmHg" value="0.1" />
+        <phase units="rad" value="0" />
+        <period units="s" value="1" />
+      </condition>
+      <normal units="dimensionless" value="(1.95124e-12,6.75884e-12,1.00000e0)" />
+      <position units="lattice" value="(77.999,18.1515,3.0)" />
+    </inlet>
+  </inlets>
+  <outlets>
+    <outlet>
+      <condition subtype="cosine" type="pressure">
+        <amplitude units="mmHg" value="0" />
+        <mean units="mmHg" value="0" />
+        <phase units="rad" value="0" />
+        <period units="s" value="1" />
+      </condition>
+      <normal units="dimensionless" value="(7.07107e-1,-1.16626e-11,-7.07107e-1)" />
+      <position units="lattice" value="(13.7137,18.1515,173.351)" />
+    </outlet>
+    <outlet>
+      <condition subtype="cosine" type="pressure">
+        <amplitude units="mmHg" value="0" />
+        <mean units="mmHg" value="0" />
+        <phase units="rad" value="0" />
+        <period units="s" value="1" />
+      </condition>
+      <normal units="dimensionless" value="(-7.07107e-1,-2.00453e-11,-7.07107e-1)" />
+      <position units="lattice" value="(142.284,18.1515,173.351)" />
+    </outlet>
+  </outlets>
+  <particles>
+    <sphereRadius units="lattice" value="4" />
+    <sphereCentre units="lattice" x="77.999" y="18.1515" z="50" />
+    <emissionCount units="dimensionless" value="100" />
+    <emissionItrvl units="dimensionless" value="10" />
+    <subgridParticle units="lattice" ParticleID="0" Radius="0.01">
+      <initialPosition units="lattice" x="68" y="18.1515" z="40" />
+    </subgridParticle>
+  </particles>
+  <bodyForces />
+  <boundaryConditions>
+    <lubrication appliesTo="Wall" effectiveRange="1" />
+    <deletion appliesTo="Olet" effectiveRange="1" />
+    <spherical appliesTo="Sphr">
+      <sphereRadius units="lattice" value="0" />
+      <sphereCentre units="lattice" x="0" y="0" z="0" />
+    </spherical>
+  </boundaryConditions>
+  <properties>
+    <propertyoutput file="whole.dat" period="100">
+      <geometry type="whole" />
+      <field type="velocity" />
+      <field type="pressure" />
+    </propertyoutput>
+  </properties>
+</hemelbsettings>

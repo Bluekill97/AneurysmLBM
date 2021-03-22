@@ -10,6 +10,8 @@ using HemeSimulation.Tasks.LinuxSetup;
 
 namespace HemeSimulation {
     public class UnixManager {
+        public bool verbose = true;
+
         private TerminalManager TerminalMgr;
 
         /// <summary>
@@ -34,12 +36,19 @@ namespace HemeSimulation {
 
         private bool RequirementCheckSuccessfull = false;
         private bool HemeSetupSuccessfull = false;
+        private bool HemeBuildSuccess = false;
+        private bool SimulationSuccess = false;
 
         public UnixManager() {
             TerminalMgr = new TerminalManager();
             PopulateTaskList();
         }
 
+        /// <summary>
+        /// Starts task queue to set up Linux (installation of Linux itself not included) by installing all necessary packages
+        /// Should only be done once for setup (and when there are updates maybe)
+        /// </summary>
+        /// <returns> True if setup was successfull </returns>
         public async Task<bool> UnixRequirementCheckAsync() {
             // TODO: maybe check for internet connection, e.g. ping google.com
 
@@ -47,12 +56,15 @@ namespace HemeSimulation {
 
             // TODO: Debug and replace this hotfix
             // somehow the version checks only work the 2nd time
-            RequirementCheckSuccessfull = await ExecuteCommandQueue(LinuxCheckStartTaskID);         
+            RequirementCheckSuccessfull = await ExecuteCommandQueue(LinuxCheckStartTaskID);
 
             return RequirementCheckSuccessfull;
         }
 
-
+        /// <summary>
+        /// Installs the Heme software (download from git) and builds its dependencies
+        /// </summary>
+        /// <returns> True if setup was successfull </returns>
         public async Task<bool> HemeSimSetupAsync() {
             if (!RequirementCheckSuccessfull)
                 return false;
@@ -62,29 +74,33 @@ namespace HemeSimulation {
             return HemeSetupSuccessfull;
         }
 
-        
+        /// <summary>
+        /// Builds Heme sofware with entered settings and starts the simulation
+        /// </summary>
+        /// <returns> True if setup was successfull </returns>
         public async Task<bool> HemeSimStartAsync() {
-            bool BuildSuccess;
-
-            // TODO: check if Heme is build with correct settings
-            // workaround: just delete and build 
+            // TODO: check if Heme is already build with correct settings (then skip the heme build)
+            // workaround: just delete and build new
 
             // Heme build
-            BuildSuccess = await ExecuteCommandQueue(HemeBuildStartTaskID);
-           
-            if (!BuildSuccess)
+            HemeBuildSuccess = await ExecuteCommandQueue(HemeBuildStartTaskID);
+
+            if (!HemeBuildSuccess)
                 return false;
 
 
             // Start Simulations
-            return await ExecuteCommandQueue(SimulationStartTaskID);
-        } 
+            SimulationSuccess = await ExecuteCommandQueue(SimulationStartTaskID);
+
+            return SimulationSuccess;
+        }
 
         private async Task<bool> ExecuteCommandQueue(int startID) {
             TaskStack = new List<ITerminalTask>();
-            
+
             int nextTaskID = startID;
 
+            // work off all tasks, for a overview look at the ITerminalTask class (end of the file)
             while (TaskDic.ContainsKey(nextTaskID)) {
                 TaskDic.TryGetValue(nextTaskID, out ttask);
 
@@ -94,19 +110,23 @@ namespace HemeSimulation {
                     TaskStack.Add(ttask);
                     LogStackForError();
                     return false;
-                }               
+                }
 
-                Debug.Log("<color=blue>Executing command " + ttask.GetID() + " " + ttask.GetName() + "</color>");
+                // TODO: instead of this if insert some interface to show progress to the user?
+                if (verbose)
+                    Debug.Log("<color=blue>Executing command " + ttask.GetID() + " " + ttask.GetName() + "</color>");
 
+                // Execute and wait for task
                 bool exitedSuccessful = await TerminalMgr.RunAsync(ttask);
 
-                Debug.Log($"<color=teal>Task {ttask.GetName()} was " + (exitedSuccessful ? "successful" : "unsuccessful")
-                     + ", continuing with task " + (TaskDic.ContainsKey(ttask.GetNextID()) ? TaskDic[ttask.GetNextID()].GetName() : $"<no new task with ID {ttask.GetNextID()}></color>"));
+                if (verbose)
+                    Debug.Log($"<color=teal>Task {ttask.GetName()} was " + (exitedSuccessful ? "successful" : "unsuccessful")
+                         + ", continuing with task " + (TaskDic.ContainsKey(ttask.GetNextID()) ? TaskDic[ttask.GetNextID()].GetName() : $"<no new task with ID {ttask.GetNextID()}></color>"));
 
                 TaskStack.Add(ttask);
 
                 if (!exitedSuccessful) {
-                    //TODO: inform user
+                    // TODO: inform user
                     Debug.LogError($"<color=red> Task {ttask.GetName()} ended with an error</color>");
                     LogStackForError();
                     return false;
@@ -134,13 +154,14 @@ namespace HemeSimulation {
 
         private void PopulateTaskList() {
 
-            // add all ITerminalTasks to the dictionary
-            var instances = from t in Assembly.GetExecutingAssembly().GetTypes()
+            // get all ITerminalTasks to the dictionary
+            var ITTinstances = from t in Assembly.GetExecutingAssembly().GetTypes()
                             where t.GetInterfaces().Contains(typeof(ITerminalTask))
                                      && t.GetConstructor(Type.EmptyTypes) != null
                             select Activator.CreateInstance(t) as ITerminalTask;
 
-            foreach (var instance in instances)
+            // add all ITerminalTasks to the dictionary
+            foreach (var instance in ITTinstances)
                 TaskDic.Add(instance.GetID(), instance);
         }
 
@@ -148,6 +169,9 @@ namespace HemeSimulation {
             Utilities.ErrorLog.LogTaskError(TaskStack);
         }
 
+        /// <summary>
+        /// Dataholder to show progress to user 
+        /// </summary>
         public class ProgressStatus {
             public string CurrentTaskName { get; private set; }
             public int CurrentTaskNumber { get; private set; }

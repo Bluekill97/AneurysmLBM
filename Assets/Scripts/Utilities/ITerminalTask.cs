@@ -119,7 +119,7 @@ namespace Utilities.Terminal {
  * 902: HemeBuildError
  * 903: HemeSimulationError
  * 
- * TODO: evaluate output to included errors
+ * TODO: change output to included errors
  * (output evaluation for several tasks missing -> 
  * not correctly pointed towards error)
  */
