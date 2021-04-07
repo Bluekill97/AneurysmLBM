@@ -107,7 +107,7 @@ namespace Utilities.Terminal {
  * 400: Simulation folder setup         
  * 401: Copy 3D model                   (workaround only)
  * 402: Convert 3D model                (workaround only)
- * 403: Generate input.xml              (workaround only)
+ * 403: Generate input.xml              
  * 404: Simulation
  * 405: Convert data HemeXtract         (not implemented)
  * 406: Convert data Paraview           (not implemented)
